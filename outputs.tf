@@ -1,3 +1,3 @@
-output "tfc_example_table_arn" {
-  value = aws_dynamodb_table.tfc_example_table.arn
+output "instance_ips" {
+  value = ["${aws_instance.web.*.public_ip}"]
 }

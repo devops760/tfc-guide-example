@@ -4,31 +4,27 @@ provider "aws" {
   region = var.aws_region
 }
 
-provider "random" {
-  version = "2.2"
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
 }
 
-resource "random_pet" "table_name" {}
-
-resource "aws_dynamodb_table" "tfc_example_table" {
-  name = "${var.db_table_name}-${random_pet.table_name.id}"
-
-  read_capacity  = var.db_read_capacity
-  write_capacity = var.db_write_capacity
-  hash_key       = "UUID"
-  range_key      = "UserName"
-
-  attribute {
-    name = "UUID"
-    type = "S"
-  }
-
-  attribute {
-    name = "UserName"
-    type = "S"
-  }
+resource "aws_instance" "web" {
+  ami           = "${data.aws_ami.ubuntu.id}"
+  instance_type = "t2.micro"
 
   tags = {
-    user_name = var.tag_user_name
+    Name = "HelloWorld"
   }
 }
